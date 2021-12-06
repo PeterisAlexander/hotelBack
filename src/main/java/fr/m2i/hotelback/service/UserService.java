@@ -2,6 +2,8 @@ package fr.m2i.hotelback.service;
 
 import fr.m2i.hotelback.entities.UserEntity;
 import fr.m2i.hotelback.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
@@ -12,14 +14,15 @@ public class UserService {
 
     public UserService(UserRepository ur) { this.ur = ur;}
 
+    @Autowired
+    private PasswordEncoder encode;
+
     public Iterable<UserEntity> findAll() { return ur.findAll();}
 
-    public UserEntity findClient(int id) { return ur.findById(id).get();}
-
     public void addUser(UserEntity u) {
-      //u.setPassword(encoder.encode(u.getPassword()));
+      u.setPassword(encode.encode(u.getPassword()));
 
-        ur.save(u);
+      ur.save(u);
     }
 
     public UserEntity findUser(int id) {
@@ -35,9 +38,9 @@ public class UserService {
             uExistant.setPassword( u.getPassword() );
             uExistant.setRole( u.getRole() );
 
-            //if( u.getPassword().length() > 0 ){
-            //    uExistant.setPassword( encoder.encode( u.getPassword() ) );
-            //}
+            if( u.getPassword().length() > 0 ){
+                uExistant.setPassword( encode.encode( u.getPassword() ) );
+            }
 
             ur.save( uExistant );
 
